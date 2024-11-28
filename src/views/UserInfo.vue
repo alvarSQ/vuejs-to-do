@@ -1,56 +1,43 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
-import { computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
-import UIPreloader from '@/components/UI/preloader.vue'
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import UIPreloader from "@/components/UI/preloader.vue";
+import { AxiosError } from "axios";
+import axiosApiInstance from '@/modules/api'
 
 const router = useRouter();
 const authStore = useAuthStore();
-const { accessToken } = storeToRefs(useAuthStore());
+
+const user = ref({} as IUserInfo);
 
 const logout = () => {
   authStore.logUserOut();
   router.push("/login");
 };
 
-// const { data, status, execute, refresh } = await useFetch(
-//   "https://dummyjson.com/auth/me",
-//   {
-//     method: "GET",
-//     headers: {'Authorization': `Bearer ${accessToken.value}`},
-//     immediate: false,
-//     watch: [accessToken],
-//   }
-// );
+const getUserData = async () => {
+  authStore.isLoading = true;
+  try {
+    const response = await axiosApiInstance.get(`https://dummyjson.com/auth/me`);
+    if (response.data) {
+      user.value = response.data as IUserInfo;
+    }
+  } catch (err) {
+    console.log((err as AxiosError).response?.data);
+  } finally {
+    authStore.isLoading = false;
+  }
+};
 
-// const refreshData = async () => {
-//   await execute();
-//   if (!data.value) {
-//     await authStore.refreshAuthUser();
-//     await refresh();
-//   }
-//   authStore.user = data.value as IUserInfo;
-// };
-
-// const fN = computed(() => (data.value ? authStore.user.firstName : ""));
-// const pending = computed(() => (status.value === 'pending' ? true : false));
-
-// onMounted(() => refreshData());
+onMounted(async () => await getUserData());
 </script>
 
 <template>
-    <div>
-      <!-- <UIPreloader v-if="pending" /> -->
-      <p>Привет</p>
+  <div class="container">
+    <UIPreloader v-if="authStore.isLoading" />
+    <p v-else>Привет {{ user.firstName }}</p>
 
-      <button class="btn" @click="logout">logout</button>
-      <!-- <nuxt-link
-      :to="{ name: 'posts', query: { page: 1 } }"
-      class="text-5xl font-extrabold text-zinc-400"
-      >Перейти к постам</nuxt-link
-    > -->
-    </div>
-    <!-- <AuthInputs v-if="!authStore.user.username" /> -->
-  
+    <button class="btn" @click="logout">logout</button>
+  </div>
 </template>

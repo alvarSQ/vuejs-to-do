@@ -8,12 +8,13 @@ const router = useRouter();
 
 const userInput = reactive({
   username: "",
-  password: ""
+  password: "",
+  expiresInMins: authStore.expiresInMins
 });
 
-const userInputAuth = async () => {
-  await authStore.authUser(userInput);
-  router.push("/");
+const userInputAuth = async () => {  
+  await authStore.authUser('login', userInput);
+  router.push("/user");
 };
 </script>
 

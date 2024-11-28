@@ -1,60 +1,48 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { AxiosError } from 'axios';
+import axiosApiInstance from '@/modules/api'
 
 const URL = 'https://dummyjson.com/auth';
 
 export const useAuthStore = defineStore('auth', () => {
 
-  const expiresInMins = 1 // сколько живет accessToken
-  const user = ref({} as IUserInfo)
+  const expiresInMins = ref(1) // сколько живет accessToken
+  const isLoading = ref(false)
 
-  const accessToken = user.value.accessToken
-  const refreshToken = user.value.refreshToken
+  const accessToken = ref('')
+  const refreshToken = ref('')
 
-  const authUser = async (userLogin: IUserLogin) => {
-    if (userLogin.username && userLogin.password) {
-      userLogin.expiresInMins = expiresInMins
-      try {
-        const data = await fetch(`${URL}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(userLogin)
-        });
-        if (data) {
-          accessToken.value = (data as IUserInfo).accessToken;
-          refreshToken.value = (data as IUserInfo).refreshToken;
-        }
-      } catch (e) {
-        (e as Error).message.includes('400') ? alert('Неправильное имя или пароль') : alert('Ошибка соединения')
-      }
-    } else alert('заполни все поля')
-  }
-
-  const refreshAuthUser = async () => {
+  const authUser = async (type: string, userLogin?: IUserLogin) => {
+    isLoading.value = true
     try {
-      const data = await $fetch(`${URL}/refresh`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          refreshToken: `${refreshToken.value}`,
-          expiresInMins: expiresInMins,
-        }),
-      });
-      if (data) {
-        accessToken.value = (data as IUserInfo).accessToken;
-        refreshToken.value = (data as IUserInfo).refreshToken;
+      const response = await axiosApiInstance.post(`${URL}/${type}`, {
+        ...userLogin,
+        // grant_type: 'refreshToken',
+        // returnSecureToken: true
+      })
+      if (response.data) {
+        accessToken.value = (response.data as IUserInfo).accessToken;
+        refreshToken.value = (response.data as IUserInfo).refreshToken;
       }
-    } catch (e) {
-      (e as Error).message.includes('400') ? alert('Неправильное имя или пароль') : alert('Ошибка соединения')
+    } catch (err) {
+      console.log((err as AxiosError).response?.data)
+    } finally {
+      isLoading.value = false
     }
   }
 
   const logUserOut = () => {
     accessToken.value = '';
-    refreshToken.value = null;
+    refreshToken.value = '';
   }
 
 
-  return { user, accessToken, refreshToken, authUser, refreshAuthUser, logUserOut }
-}
+  return { isLoading, accessToken, refreshToken, expiresInMins, authUser, logUserOut }
+},
+  {
+    persist: {
+      pick: ['accessToken', 'refreshToken'],
+    },
+  }
 )
