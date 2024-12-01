@@ -1,5 +1,5 @@
 <template>
-  <div class="dual-ring"/>
+  <div class="dual-ring" />
 </template>
 
 <script setup></script>
@@ -24,8 +24,8 @@
     height: 75px;
     margin: 8px;
     border-radius: 50%;
-    border: 6px solid #48B322;
-    border-color: #48B322 transparent #48B322 transparent;
+    border: 6px solid white;
+    border-color: white transparent white transparent;
     animation: lds-dual-ring 1.2s linear infinite;
   }
 }

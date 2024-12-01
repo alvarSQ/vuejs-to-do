@@ -1,0 +1,15 @@
+@use "sass:math";
+
+$full-width: 1920;
+$work-width: 59;
+$screen-height: 720;
+$browser-context: 16; 
+$width-content: 822; 
+
+@function wmax($pixels, $context: $full-width) {
+  @return #{math.div($pixels, $context)* 100}vw 
+}
+
+@function hmax($pixels, $context: $screen-height) {
+  @return #{math.div($pixels, $context)* 100}vh 
+}

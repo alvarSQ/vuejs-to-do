@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { AxiosError } from 'axios';
-import axiosApiInstance from '@/modules/api'
+import axiosApiInstance from '@/modules/api-auth'
 
 const URL = 'https://dummyjson.com/auth';
 
@@ -10,6 +10,12 @@ export const useAuthStore = defineStore('auth', () => {
   const expiresInMins = ref(1) // сколько живет accessToken
   const isLoading = ref(false)
 
+  const userInfo = ref({} as IUserInfo);
+  const userName = ref('')
+  const userId = ref(1)
+
+  const getUserName = computed(() => userName.value)
+
   const accessToken = ref('')
   const refreshToken = ref('')
 
@@ -17,9 +23,7 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading.value = true
     try {
       const response = await axiosApiInstance.post(`${URL}/${type}`, {
-        ...userLogin,
-        // grant_type: 'refreshToken',
-        // returnSecureToken: true
+        ...userLogin
       })
       if (response.data) {
         accessToken.value = (response.data as IUserInfo).accessToken;
@@ -38,11 +42,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
 
-  return { isLoading, accessToken, refreshToken, expiresInMins, authUser, logUserOut }
+  return { isLoading, userId, userName, getUserName, accessToken, refreshToken, expiresInMins, authUser, logUserOut }
 },
   {
     persist: {
-      pick: ['accessToken', 'refreshToken'],
+      pick: ['accessToken', 'refreshToken', 'userName'],
     },
   }
 )

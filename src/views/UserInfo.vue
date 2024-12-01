@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import UIPreloader from "@/components/UI/preloader.vue";
 import { AxiosError } from "axios";
-import axiosApiInstance from '@/modules/api'
+import axiosApiInstance from "@/modules/api-auth";
+import Title from "@/components/UI/title.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
 
 const user = ref({} as IUserInfo);
 
-const logout = () => {
-  authStore.logUserOut();
-  router.push("/login");
-};
+const fieldsUser = ref(["id", "username", "email", "firstName", "lastName", "gender"]);
+
+
 
 const getUserData = async () => {
   authStore.isLoading = true;
@@ -26,6 +26,8 @@ const getUserData = async () => {
   } catch (err) {
     console.log((err as AxiosError).response?.data);
   } finally {
+    authStore.userName = user.value.firstName
+    authStore.userId = user.value.id
     authStore.isLoading = false;
   }
 };
@@ -36,8 +38,31 @@ onMounted(async () => await getUserData());
 <template>
   <div class="container">
     <UIPreloader v-if="authStore.isLoading" />
-    <p v-else>Привет {{ user.firstName }}</p>
-
-    <button class="btn" @click="logout">logout</button>
+    <div class="content" v-else>
+      <Title>
+        <p>{{ user.firstName }}</p>
+      </Title>
+      <ul class="list">
+        <template v-for="(value, key, index) of user">
+          <li v-if="fieldsUser.indexOf(key) > -1">
+          <div class="flex-center">
+            <p class="fon">{{ key + ": " }}</p>
+            <p :class="{ 'task-ready': false }">
+              {{ value }}
+            </p>
+            </div>
+          </li>
+        </template>
+      </ul>
+    </div>
   </div>
 </template>
+
+<style>
+.fon {
+  margin-left: -10px;
+  padding-left: 20px;
+  padding-right: 5px;
+  background-color: #2c2c2c;
+}
+</style>

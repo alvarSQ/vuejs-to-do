@@ -8,7 +8,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    vueDevTools()
   ],
   css: {
     preprocessorOptions: {
@@ -21,5 +21,6 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
-  },
+  }
+  // , base: '/vuejs-to-do'
 })

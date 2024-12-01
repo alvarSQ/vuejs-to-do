@@ -6,7 +6,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
 import App from './App.vue'
 import router from './router'
-import '@/modules/api.ts' 
+import '@/modules/api-auth'
 
 const app = createApp(App)
 
