@@ -11,11 +11,8 @@ export const useTodoStore = defineStore('todo', () => {
   const todoDataByUserId = ref({} as ITodo[])
   const getTodoDataByUserId = computed(() => todoDataByUserId.value)
 
-  const newTask = ref('')
-
   const toTodoById = async (type?: string) => {
-    const { isLoading } = storeToRefs(useAuthStore());     
-    isLoading.value = true
+    const { isLoading } = storeToRefs(useAuthStore());    
     try {
       const response = await axiosTodo(`${URL + type}`)      
       if (response.data) {
@@ -23,12 +20,10 @@ export const useTodoStore = defineStore('todo', () => {
       }
     } catch (err) {
       console.log((err as AxiosError).response)
-    } finally {
-      isLoading.value = false
-    }
+    } 
   } 
 
-  return { todoDataByUserId, getTodoDataByUserId, newTask, toTodoById }
+  return { todoDataByUserId, getTodoDataByUserId, toTodoById }
 },
   {
     persist: {

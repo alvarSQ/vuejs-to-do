@@ -1,47 +1,43 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useTodoStore } from "@/stores/todo";
-import { storeToRefs } from "pinia";
-import { useAuthStore } from "@/stores/auth";
 import axios, { AxiosError } from "axios";
 
 const todoStore = useTodoStore();
-const { isLoading } = storeToRefs(useAuthStore());
 
 const editTask = ref("");
-const isEdit = ref(true);
+const isEditInput = ref(false);
 
 const delEditTask = async (idTask: number, methodStr: string) => {
-  isLoading.value = true;
   try {
     const response = await axios(`https://dummyjson.com/todos/${idTask}`, {
       method: methodStr,
       data: {
         todo: editTask.value,
       },
-    });    
+    });
     todoStore.todoDataByUserId.filter((e) => {
       if (e.id === idTask && methodStr === "DELETE") {
         e.isDeleted = response.data.isDeleted;
         e.deletedOn = response.data.deletedOn;
       }
-      if (e.id === idTask && methodStr === "PUT") {
-        e.todo = response.data.todo,  
-        e.isEdit = false;
+      if (e.id === idTask && methodStr === "PUT" && isEditInput.value) {      
+        (e.todo = response.data.todo), (e.isEdit = false);
+        editTask.value = "";
+        isEditInput.value = false;
       }
     });
   } catch (err) {
     console.log((err as AxiosError).response);
-  } finally {
-    isLoading.value = false;
-  }
+  } 
 };
 
 const edit = (idTask: number) => {
-  todoStore.todoDataByUserId.forEach(e => e.id === idTask ? editTask.value = e.todo : '')   
-  todoStore.todoDataByUserId.forEach((e) => {    
+  todoStore.todoDataByUserId.forEach((e) => e.id === idTask ? (editTask.value = e.todo) : "");
+  todoStore.todoDataByUserId.forEach((e) => {
     if (e.id === idTask) {
       e.isEdit = true;
+      isEditInput.value = true;
     } else {
       e.isEdit = false;
     }
@@ -63,7 +59,7 @@ onMounted(async () => await todoStore.toTodoById("/user"));
         />
         <p
           :class="{ 'task-ready': task.completed }"
-          v-if="!task.isEdit && isEdit"
+          v-if="!task.isEdit"
           @click="edit(task.id)"
         >
           {{ task.todo }}
@@ -71,7 +67,7 @@ onMounted(async () => await todoStore.toTodoById("/user"));
         <input class="editInput" type="text" v-model="editTask" v-else />
       </div>
       <div class="edit">
-        <div class="icon-box" @click="delEditTask(task.id, 'PUT')">
+        <button class="icon-box" @click="delEditTask(task.id, 'PUT')" :disabled="!task.isEdit">
           <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
             <path
               d="M16 20H12V16L24 4L28 8L16 20Z"
@@ -95,7 +91,7 @@ onMounted(async () => await todoStore.toTodoById("/user"));
               stroke-linejoin="round"
             />
           </svg>
-        </div>
+        </button>
         <div class="icon-box" @click="delEditTask(task.id, 'DELETE')">
           <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
             <path
@@ -147,9 +143,24 @@ onMounted(async () => await todoStore.toTodoById("/user"));
 .editInput {
   width: wmax(670);
   @media (max-width: 1240px) {
-    width: wmax(550)
+    width: wmax(640);
+  }
+  @media (max-width: 940px) {
+    width: wmax(810);
+  }
+  @media (max-width: 640px) {
+    width: wmax(1095);
+  }
+   @media (max-width: 300px) {
+    width: 100%;
   }
 }
+
+.edit {
+      display: flex;
+      border-radius: 10px;
+      gap: 5px;
+    }
 
 .task-ready {
   text-decoration: line-through;
@@ -173,6 +184,7 @@ input[type="checkbox"] {
   height: wmax(38);
   cursor: pointer;
   border-radius: 10px;
+  padding: 0;
   background-color: #999;
   @media (max-width: 1240px) {
     width: 25px;
