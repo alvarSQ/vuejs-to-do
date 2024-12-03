@@ -8,14 +8,26 @@ import axios, { AxiosError } from "axios";
 const todoStore = useTodoStore();
 const { isLoading } = storeToRefs(useAuthStore());
 
-const delTask = async (idTask: number) => {
+const editTask = ref("");
+const isEdit = ref(true);
+
+const delEditTask = async (idTask: number, methodStr: string) => {
   isLoading.value = true;
   try {
-    const response = await axios.delete(`https://dummyjson.com/todos/${idTask}`);
+    const response = await axios(`https://dummyjson.com/todos/${idTask}`, {
+      method: methodStr,
+      data: {
+        todo: editTask.value,
+      },
+    });    
     todoStore.todoDataByUserId.filter((e) => {
-      if (e.id === idTask) {
+      if (e.id === idTask && methodStr === "DELETE") {
         e.isDeleted = response.data.isDeleted;
         e.deletedOn = response.data.deletedOn;
+      }
+      if (e.id === idTask && methodStr === "PUT") {
+        e.todo = response.data.todo,  
+        e.isEdit = false;
       }
     });
   } catch (err) {
@@ -23,6 +35,17 @@ const delTask = async (idTask: number) => {
   } finally {
     isLoading.value = false;
   }
+};
+
+const edit = (idTask: number) => {
+  todoStore.todoDataByUserId.forEach(e => e.id === idTask ? editTask.value = e.todo : '')   
+  todoStore.todoDataByUserId.forEach((e) => {    
+    if (e.id === idTask) {
+      e.isEdit = true;
+    } else {
+      e.isEdit = false;
+    }
+  });
 };
 
 onMounted(async () => await todoStore.toTodoById("/user"));
@@ -38,12 +61,17 @@ onMounted(async () => await todoStore.toTodoById("/user"));
           :name="task.id.toString()"
           v-model="task.completed"
         />
-        <p :class="{ 'task-ready': task.completed}">
+        <p
+          :class="{ 'task-ready': task.completed }"
+          v-if="!task.isEdit && isEdit"
+          @click="edit(task.id)"
+        >
           {{ task.todo }}
         </p>
+        <input class="editInput" type="text" v-model="editTask" v-else />
       </div>
       <div class="edit">
-        <div class="icon-box">
+        <div class="icon-box" @click="delEditTask(task.id, 'PUT')">
           <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
             <path
               d="M16 20H12V16L24 4L28 8L16 20Z"
@@ -68,7 +96,7 @@ onMounted(async () => await todoStore.toTodoById("/user"));
             />
           </svg>
         </div>
-        <div class="icon-box" @click="delTask(task.id)">
+        <div class="icon-box" @click="delEditTask(task.id, 'DELETE')">
           <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
             <path
               d="M24.7969 6.98438H5.20312"
@@ -115,6 +143,13 @@ onMounted(async () => await todoStore.toTodoById("/user"));
 
 <style lang="scss">
 @use "@/assets/scss/var.scss" as *;
+
+.editInput {
+  width: wmax(670);
+  @media (max-width: 1240px) {
+    width: wmax(550)
+  }
+}
 
 .task-ready {
   text-decoration: line-through;

@@ -59,6 +59,15 @@
   svg {
     width: 6%;
   }
+  @media (max-width: 830px) {
+    width: wmax(600);
+  }
+  @media (max-width: 670px) {
+    width: wmax(800);
+  }
+  @media (max-width: 500px) {
+    width: wmax(1400);
+  }
 }
 .line {
   width: 10%;

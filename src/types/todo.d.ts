@@ -3,6 +3,7 @@ declare interface ITodo {
     todo: string,
     completed: boolean,
     userId: number,
+    isEdit?: boolean
     isDeleted?: true,
     deletedOn?: string
 }

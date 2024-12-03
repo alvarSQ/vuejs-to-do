@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import UIPreloader from "@/components/UI/preloader.vue";
+import Preloader from "@/components/UI/preloader.vue";
 import { AxiosError } from "axios";
 import axiosApiInstance from "@/modules/api-auth";
 import Title from "@/components/UI/title.vue";
@@ -13,8 +13,6 @@ const authStore = useAuthStore();
 const user = ref({} as IUserInfo);
 
 const fieldsUser = ref(["id", "username", "email", "firstName", "lastName", "gender"]);
-
-
 
 const getUserData = async () => {
   authStore.isLoading = true;
@@ -38,7 +36,7 @@ onMounted(async () => await getUserData());
 
 <template>
   <div class="container">
-    <UIPreloader v-if="authStore.isLoading" />
+    <Preloader v-if="authStore.isLoading" />
     <div class="content" v-else>
       <Title>
         <p>{{ user.firstName }}</p>

@@ -63,17 +63,22 @@ const userInputAuth = async () => {
   font-size: 1.2em;
   font-weight: 600;
   text-align: center;
-  color: #022246;
+  color: #222;
 }
 
 label {
-  color: #022246;
+  color: #222;
 }
 
 .text-field {
   display: flex;
   flex-direction: column;
+  width: 100%;
   gap: 20px;
+  .btn {
+    font-family: "Inter";
+    font-size: medium;
+  }
 }
 
 .text-field__label {
@@ -93,7 +98,7 @@ label {
   color: #212529;
   background-color: #fff;
   background-clip: padding-box;
-  border: 1px solid #7da4d1;
+  border: 1px solid #999;
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   &::placeholder {
@@ -102,8 +107,8 @@ label {
   }
   &:focus {
     color: #212529;
-    background-color: #fff;
-    border-color: #7da4d1;
+    background-color: #f3f0f0;
+    border-color: #222;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(158, 158, 158, 0.25);
   }
@@ -112,6 +117,7 @@ label {
 .modal {
   display: flex;
   flex-direction: column;
+  align-items: center;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -127,7 +133,7 @@ label {
 }
 
 .dark {
-  background: #033268;
+  background: #222;
   position: fixed;
   left: 0;
   top: 0;
