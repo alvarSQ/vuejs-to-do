@@ -13,6 +13,7 @@ export const useAuthStore = defineStore('auth', () => {
   const userInfo = ref({} as IUserInfo);
   const userName = ref('')
   const userId = ref(1)
+  const userImg = ref('')
 
   const getUserName = computed(() => userName.value)
 
@@ -42,11 +43,11 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
 
-  return { isLoading, userId, userName, getUserName, accessToken, refreshToken, expiresInMins, authUser, logUserOut }
+  return { isLoading, userId, userName, getUserName, accessToken, refreshToken, userImg, expiresInMins, authUser, logUserOut }
 },
   {
     persist: {
-      pick: ['accessToken', 'refreshToken', 'userName'],
+      pick: ['accessToken', 'refreshToken', 'userName', 'userId', 'userImg'],
     },
   }
 )

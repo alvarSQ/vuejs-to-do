@@ -24,34 +24,3 @@
       width: 90%;
   }
 }
-
-// .navbar-logo {
-//   color: $g-999;
-//   font-weight: 700;
-// }
-
-.navbar-list {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.navbar-item {
-  margin-right: 30px;
-  cursor: pointer;
-  &:last-child {
-    margin-right: 0;
-  }
-}
-
-.navbar-link {
-  display: block;
-  transition: all 0.2s ease;
-  // color: $purple-color-100;
-  // active link
-  &.isActive,
-  &.router-link-active,
-  &.router-link-exact-active {
-    text-decoration: underline;
-  }
-}

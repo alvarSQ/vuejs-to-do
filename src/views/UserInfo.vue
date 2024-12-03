@@ -23,11 +23,12 @@ const getUserData = async () => {
     if (response.data) {
       user.value = response.data as IUserInfo;
     }
+    authStore.userName = user.value.firstName
+    authStore.userId = user.value.id
+    authStore.userImg = user.value.image
   } catch (err) {
     console.log((err as AxiosError).response?.data);
   } finally {
-    authStore.userName = user.value.firstName
-    authStore.userId = user.value.id
     authStore.isLoading = false;
   }
 };
