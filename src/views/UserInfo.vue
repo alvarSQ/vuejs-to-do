@@ -1,37 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { onMounted, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import Preloader from "@/components/UI/preloader.vue";
-import { AxiosError } from "axios";
-import axiosApiInstance from "@/modules/api-auth";
 import Title from "@/components/UI/title.vue";
 
-const router = useRouter();
 const authStore = useAuthStore();
-
-const user = ref({} as IUserInfo);
 
 const fieldsUser = ref(["id", "username", "email", "firstName", "lastName", "gender"]);
 
-const getUserData = async () => {
-  authStore.isLoading = true;
-  try {
-    const response = await axiosApiInstance.get(`https://dummyjson.com/auth/me`);
-    if (response.data) {
-      user.value = response.data as IUserInfo;
-    }
-    authStore.userName = user.value.firstName
-    authStore.userId = user.value.id
-    authStore.userImg = user.value.image
-  } catch (err) {
-    console.log((err as AxiosError).response?.data);
-  } finally {
-    authStore.isLoading = false;
-  }
-};
-
-onMounted(async () => await getUserData());
+onMounted(async () => await authStore.getUserData());
 </script>
 
 <template>
@@ -39,10 +16,10 @@ onMounted(async () => await getUserData());
     <Preloader v-if="authStore.isLoading" />
     <div class="content" v-else>
       <Title>
-        <p>{{ user.firstName }}</p>
+        <p>{{ authStore.userInfo.firstName }}</p>
       </Title>
       <ul class="list">
-        <template v-for="(value, key, index) of user">
+        <template v-for="(value, key, index) of authStore.userInfo">
           <li v-if="fieldsUser.indexOf(key) > -1">
           <div class="flex-center">
             <p class="fon">{{ key + ": " }}</p>

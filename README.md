@@ -1,5 +1,7 @@
 # To Do на Vue3 + TS
 
+[https://practice.argovera.ru/](https://practice.argovera.ru/)
+
 Настойка JWT авторизации на: [https://dummyjson.com/docs/auth](https://dummyjson.com/docs/auth)
 
 Получение и редактирования списка задач из: [https://dummyjson.com/docs/todos](https://dummyjson.com/docs/todos)

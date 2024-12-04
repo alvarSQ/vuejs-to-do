@@ -1,43 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import { useTodoStore } from "@/stores/todo";
-import axios, { AxiosError } from "axios";
 
 const todoStore = useTodoStore();
 
-const editTask = ref("");
-const isEditInput = ref(false);
-
-const delEditTask = async (idTask: number, methodStr: string) => {
-  try {
-    const response = await axios(`https://dummyjson.com/todos/${idTask}`, {
-      method: methodStr,
-      data: {
-        todo: editTask.value,
-      },
-    });
-    todoStore.todoDataByUserId.filter((e) => {
-      if (e.id === idTask && methodStr === "DELETE") {
-        e.isDeleted = response.data.isDeleted;
-        e.deletedOn = response.data.deletedOn;
-      }
-      if (e.id === idTask && methodStr === "PUT" && isEditInput.value) {      
-        (e.todo = response.data.todo), (e.isEdit = false);
-        editTask.value = "";
-        isEditInput.value = false;
-      }
-    });
-  } catch (err) {
-    console.log((err as AxiosError).response);
-  } 
-};
-
 const edit = (idTask: number) => {
-  todoStore.todoDataByUserId.forEach((e) => e.id === idTask ? (editTask.value = e.todo) : "");
+  todoStore.todoDataByUserId.forEach((e) => e.id === idTask ? (todoStore.editTask = e.todo) : "");
   todoStore.todoDataByUserId.forEach((e) => {
     if (e.id === idTask) {
       e.isEdit = true;
-      isEditInput.value = true;
     } else {
       e.isEdit = false;
     }
@@ -64,10 +35,10 @@ onMounted(async () => await todoStore.toTodoById("/user"));
         >
           {{ task.todo }}
         </p>
-        <input class="editInput" type="text" v-model="editTask" v-else />
+        <input class="editInput" type="text" v-model="todoStore.editTask" v-else />
       </div>
       <div class="edit">
-        <button class="icon-box" @click="delEditTask(task.id, 'PUT')" :disabled="!task.isEdit">
+        <button class="icon-box" @click="todoStore.delEditTask(task.id, 'PUT')" :disabled="!task.isEdit">
           <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
             <path
               d="M16 20H12V16L24 4L28 8L16 20Z"
@@ -92,7 +63,7 @@ onMounted(async () => await todoStore.toTodoById("/user"));
             />
           </svg>
         </button>
-        <div class="icon-box" @click="delEditTask(task.id, 'DELETE')">
+        <div class="icon-box" @click="todoStore.delEditTask(task.id, 'DELETE')">
           <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
             <path
               d="M24.7969 6.98438H5.20312"

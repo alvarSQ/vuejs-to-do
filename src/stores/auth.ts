@@ -37,13 +37,30 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const getUserData = async () => {
+    isLoading.value = true;
+    try {
+      const response = await axiosApiInstance.get(`${URL}/me`);
+      if (response.data) {
+        userInfo.value = response.data as IUserInfo;
+      }
+      userName.value = userInfo.value.firstName
+      userId.value = userInfo.value.id
+      userImg.value = userInfo.value.image
+    } catch (err) {
+      console.log((err as AxiosError).response?.data);
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   const logUserOut = () => {
     accessToken.value = '';
     refreshToken.value = '';
   }
 
 
-  return { isLoading, userId, userName, getUserName, accessToken, refreshToken, userImg, expiresInMins, authUser, logUserOut }
+  return { isLoading, userInfo, userId, userName, getUserName, accessToken, refreshToken, userImg, expiresInMins, authUser, logUserOut, getUserData }
 },
   {
     persist: {
