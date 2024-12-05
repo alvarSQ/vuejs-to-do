@@ -2,7 +2,6 @@ import { defineStore, storeToRefs } from 'pinia';
 import { useAuthStore } from "@/stores/auth";
 import { computed, ref } from 'vue';
 import axios, { AxiosError } from 'axios';
-import axiosTodo from '@/modules/api-todo-list'
 
 
 const URL = 'https://dummyjson.com/todos';
@@ -21,18 +20,38 @@ export const useTodoStore = defineStore('todo', () => {
 
   const editTask = ref("");
 
+  const paginationTotal = ref(0)
 
-  const toTodoById = async (type?: string) => { 
+
+  const toTodoById = async (type?: string) => {
     try {
-      const response = await axiosTodo(`${URL + type}`)      
+      const response = await axios.get(`${URL + type}/${userId.value}`)
       if (response.data) {
         todoDataByUserId.value = (response.data as ITodoList).todos;
       }
     } catch (err) {
       console.log((err as AxiosError).response)
-    } 
-  } 
+    }
+  }
 
+  const toTodoPagination = async (page: number, limit: number) => {
+    let skip = 0
+    page === 1 ? skip : skip = limit * (page - 1)
+    try {
+      const response = await axios.get(`${URL}`, {
+        params: {
+          limit: limit,
+          skip: skip
+        }
+      })
+      if (response.data) {
+        todoDataByUserId.value = (response.data as ITodoList).todos;
+        paginationTotal.value = (response.data as ITodoList).total
+      }
+    } catch (err) {
+      console.log((err as AxiosError).response)
+    }
+  }
 
   const addTask = async () => {
     if (newTask.value.todo) {
@@ -49,7 +68,7 @@ export const useTodoStore = defineStore('todo', () => {
       }
     }
   };
-  
+
   const delEditTask = async (idTask: number, methodStr: string) => {
     try {
       const response = await axios(`${URL}/${idTask}`, {
@@ -73,7 +92,7 @@ export const useTodoStore = defineStore('todo', () => {
     }
   };
 
-  return { todoDataByUserId, getTodoDataByUserId, newTask, editTask, toTodoById, addTask, delEditTask }
+  return { todoDataByUserId, getTodoDataByUserId, newTask, editTask, paginationTotal, toTodoById, addTask, delEditTask, toTodoPagination }
 },
   {
     persist: {

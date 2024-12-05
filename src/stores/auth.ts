@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import { AxiosError } from 'axios';
-import axiosApiInstance from '@/modules/api-auth'
+import axiosApiInstance from '@/api/api-auth'
 
 const URL = 'https://dummyjson.com/auth';
 

@@ -4,9 +4,11 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
+import VueAwesomePaginate from "vue-awesome-paginate";
+import "vue-awesome-paginate/dist/style.css";
+
 import App from './App.vue'
 import router from './router'
-import '@/modules/api-auth'
 
 const app = createApp(App)
 
@@ -15,5 +17,5 @@ pinia.use(piniaPluginPersistedstate)
 
 app.use(pinia)
 app.use(router)
-
+app.use(VueAwesomePaginate)
 app.mount('#app')
